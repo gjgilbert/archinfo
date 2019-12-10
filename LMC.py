@@ -8,15 +8,20 @@ pi = np.pi
 #####
 
 def H(p, normalize_output=True):
-    '''
-    Calculates Shannon information (in nats) from a probability vector
+    """
+    Calculates Shannon information (in nats) from a probability vector.
+    
+    Parameters
+    ----------
+    p : array-like
+        vector of probabilities; will be normalized if not done so already
+    normalize_output: bool
+        boolean flag to normalize output to range (0,1); default=True
 
-    p: vector of probabilities; will be normalized if not done so already
-    normalize_output: boolean flag to normalize output to range (0,1); default=True
-
-    -- returns
-        Hout: Shannon information
-    '''
+    Returns
+    -------
+    Hout : Shannon information
+    """
     # check probabilities normalization
     if np.isclose(np.sum(p),1.0) != True:
         warnings.warn('Input probability vector was not normalized...fixing automatically')
@@ -35,15 +40,18 @@ def H(p, normalize_output=True):
 
 
 def D(p, normalize_output=True):
-    '''
+    """
     Calculates disequliibrium from a probability vector
 
-    p: vector of probabilities; will be normalized if not done so already
-    normalize_output: boolean flag to normalize output to range (0,1); default=True
+    p : array-like
+        vector of probabilities; will be normalized if not done so already
+    normalize_output: bool
+        boolean flag to normalize output to range (0,1); default=True
 
-    -- returns
-        Dout: disequilibrium
-    '''
+    Returns
+    -------
+    Dout : Disequilibrium
+    """
     # check probabilities normalization
     if np.isclose(np.sum(p),1.0) != True:
         warnings.warn('Input probability vector was not normalized...fixing automatically')
@@ -62,16 +70,18 @@ def D(p, normalize_output=True):
 
 
 def C(p, normalize_output=True):
-    '''
-    Calculates LMC complexity from a probability vector
+    """
+    Calculates LMC complexity from a probability vector (Lopez-Ruiz, Mancini, & Calbet 1995)
 
-    p: vector of probabilities; will be normalized if not done so already
-    normalize_output: boolean flag to normalize output to range (0,1); default=True
+    p : array-like
+        vector of probabilities; will be normalized if not done so already
+    normalize_output: bool
+        boolean flag to normalize output to range (0,1); default=True
 
-    Normalization determined from a power law fit to Anteneodo & Plastino (1996)
-    -- returns
-        Cout: LMC complexity
-    '''
+    Returns
+    -------
+    Cout : LMC Complexity
+    """
     # check probabilities normalization
     if np.isclose(np.sum(p),1.0) != True:
         warnings.warn('Input probability vector was not normalized...fixing automatically')
@@ -91,28 +101,31 @@ def C(p, normalize_output=True):
 
 
 def ap9(p,N):
-    '''
-    Eq.9 from Anteneodo & Plastino (1996) for fixed n=1
-    '''
+    """
+    Helper fucntion for Cmax; Eq.9 from Anteneodo & Plastino (1996) for fixed n=1
+    """
     return (2-3*p+1/N)*np.log((1-p)/(N-1)) + (3*p-1/N)*np.log(p)
 
 
 
 def ap10(p,N):
-    '''
-    Eq.10 from Anteneodo & Plastino (1996) for fixed n=1
-    '''
+    """
+    Helper function for Cmax; Eq.10 from Anteneodo & Plastino (1996) for fixed n=1
+    """
     return (1-2*p+p/N)*np.log((1-p)/(N-1)) + p*(2-1/N)*np.log(p) - (p-1/N)
 
 
 
 def Cmax(N):
-    '''
+    """
     Calculates maximum complexity (Cmax) for a given N
     Numerically solves equations from Anteneodo & Plastino (1996)
     
-    N: array_like, all entries expected to be integers >= 2; returns np.nan for any N < 2
-    '''
+    Parameters
+    ----------
+    N : array-like
+        all entries expected to be integers >= 2; returns np.nan for any N < 2
+    """
     N = np.atleast_1d(N)
     
     # check than N is
