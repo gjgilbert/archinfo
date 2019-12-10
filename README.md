@@ -1,2 +1,3 @@
 # archinfo
-Easy to use functions for describing exoplanetary system architectures
+
+Archinfo contains easy-to-use functions for describing exoplanetary system architectures
