@@ -16,7 +16,7 @@ Archinfo is a python package to calculate measures describing the architectures 
 setup(
     name='archinfo',
     version=__version__,
-    liscense='MIT',
+    license='MIT',
     author='Gregory J. Gilbert',
     author_email='gjgilbert@uchicago.edu',
     packages=['archinfo'],
