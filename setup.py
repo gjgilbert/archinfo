@@ -24,7 +24,7 @@ setup(
     url='http://github.com/gjgilbert/archinfo'
     description='Describing exoplanetary system architectures using information theory'
     long_description=long_description
-    install_requires=['scipy']
+    install_requires=['scipy', 'warnings']
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
