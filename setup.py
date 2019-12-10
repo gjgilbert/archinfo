@@ -6,7 +6,7 @@ import setuptools
 from setuptools import setup
 
 sys.path.insert(0, "archinfo")
-from version import __version
+from version import __version__
 
 long_description = \
 """
