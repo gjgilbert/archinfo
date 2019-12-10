@@ -15,13 +15,13 @@ Archinfo is a python package to calculate measures describing the architectures 
 
 setup(
     name='archinfo',
+    packages=['archinfo'],
     version=__version__,
     license='MIT',
     author='Gregory J. Gilbert',
     author_email='gjgilbert@uchicago.edu',
-    packages=['archinfo'],
     include_package_data=True,
-    url='http://github.com/gjgilbert/archinfo',
+    url='https://github.com/gjgilbert/archinfo',
     description='Describing exoplanetary system architectures using information theory',
     long_description=long_description,
     install_requires=['scipy', 'warnings'],
