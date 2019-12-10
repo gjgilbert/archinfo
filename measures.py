@@ -25,7 +25,7 @@ def P_to_a(P, Mstar):
     ----------
     P : array-like
         orbital periods [days]
-    Mstar: float
+    Mstar : float
         stellar mass [solar masses]
         
     Returns
@@ -106,7 +106,7 @@ def calculate_flatness(data_dur, model_dur):
     ----------
     data_dur : array-like
         measured transit durations [days]
-    model_dur: array-like
+    model_dur : array-like
         model transit durations [days] from leastsq fit
         
     Returns
