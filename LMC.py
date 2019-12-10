@@ -7,6 +7,10 @@ pi = np.pi
 
 #####
 
+
+__all__ = ["H", "D", "C", "Cmax"]
+
+
 def H(p, normalize_output=True):
     """
     Calculates Shannon information (in nats) from a probability vector.

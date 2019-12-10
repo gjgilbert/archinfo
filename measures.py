@@ -1,8 +1,7 @@
 import numpy as np
 import warnings
 import scipy.optimize as op
-import warnings
-import LMC
+import .LMC
 from   scipy import stats
 
 pi = np.pi
@@ -14,6 +13,9 @@ MSUN = 1.988e30    # Solar mass [kg]
 
 
 ###
+
+__all__ = ["dynamical_mass", "mass_partitioning", "monotonicity", \
+           "characteristic_spacing", "gap_complexity", "flatness"]
 
 # Functions containing relevant physics
 
@@ -122,7 +124,7 @@ def calculate_flatness(data_dur, model_dur):
 # Quantities definied in Gilbert & Fabrycky (2019)
 
 
-def mu(mp, Mstar):
+def dynamical_mass(mp, Mstar):
     """
     Dynamical mass, mu
     
@@ -136,7 +138,7 @@ def mu(mp, Mstar):
     return np.sum(mp)/MSME/Mstar
 
 
-def Q(masses):
+def mass_partitioning(masses):
     """
     Mass partitioning, Q
     
@@ -148,7 +150,7 @@ def Q(masses):
     return LMC.D(masses/np.sum(masses))
 
 
-def M(periods, masses):
+def monotonicity(periods, masses):
     """
     Monotonicity, M
     
@@ -161,11 +163,13 @@ def M(periods, masses):
     """
     N = len(periods)
     rho = stats.spearmanr(periods, masses)[0]
+    Q = mass_partitioning(masses)
     
-    return rho*Q(masses)**(1/N)
+    
+    return rho*Q**(1/N)
 
 
-def S(periods, mp, Mstar, warn=True):
+def characteristic_spacing(periods, mp, Mstar, warn=True):
     """
     Characteristic spacing, S
     
@@ -199,7 +203,7 @@ def S(periods, mp, Mstar, warn=True):
         return np.mean(delta_H)
 
 
-def C(periods, warn=True):
+def gap_complexity(periods, warn=True):
     """
     Gap complexity, C
     
@@ -224,7 +228,7 @@ def C(periods, warn=True):
         return LMC.C(pp)
     
 
-def f(periods, rhostar, rprs, dur, dur_err):
+def flatness(periods, rhostar, rprs, dur, dur_err):
     """
     Flatness, f
     
