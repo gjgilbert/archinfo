@@ -18,12 +18,21 @@ MSUN = 1.988e30    # Solar mass [kg]
 # Functions containing relevant physics
 
 def P_to_a(P, Mstar):
-    '''
+    """
     Convenience function to convert periods to semimajor axis from Kepler's Law
     
-    P: orbital periods [days]
-    Mstar: stellar mass [solar masses]
-    '''
+    Parameters
+    ----------
+    P : array-like
+        orbital periods [days]
+    Mstar: float
+        stellar mass [solar masses]
+        
+    Returns
+    -------
+    a : array-like
+        semi-major axis [stellar radii]
+    """
     Pearth = 365.24    # [days]
     aearth = 215.05    # [solar radii]
     
@@ -31,14 +40,25 @@ def P_to_a(P, Mstar):
 
 
 def calculate_duration(period, rho, rprs, cosi):
-    '''
+    """
     Helper function to calculate transit duration predicted from a circular orbit
     
-    period: orbital period [days]
-    rho: stellar density [solar density]
-    rprs: planet-to-star radius ratio for system
-    cosi: cosine(inclination)
-    '''
+    Parameters
+    ----------
+    period : array-like
+        orbital period [days]
+    rho : float
+        stellar density [solar density]
+    rprs : float
+        planet-to-star radius ratio for system
+    cosi : array-like
+        cosine(inclination)
+        
+    Returns
+    -------
+    transit_duration: array-like
+        transit duration [days]
+    """
     G = BIGG / RSUN**3 * MSUN * (24*3600)**2    # Newton's constant [R_sun^3 * M_sun^-1 * days^-2]
     
     term3  = ((3*period)/(G*rho*pi**2))**(1/3)
@@ -51,14 +71,25 @@ def calculate_duration(period, rho, rprs, cosi):
 
 
 def residuals_for_duration_fit(x0, x1, data_dur, data_err):
-    '''
+    """
     Helper function to return residuals for least squares fitting (op.leastsq)
     
-    x0: vector of parameters to vary in fit (cosi)
-    x1: vector of parameters to hold constant (periods, rhostar, rprs)
-    data_dur: measured transit durations [days]
-    data_err: corresponding errors [days]
-    '''
+    Parameters
+    ----------
+    x0 : array-like
+        vector of parameters to vary in fit (cosi)
+    x1 : array-like
+        vector of parameters to hold constant (periods, rhostar, rprs)
+    data_dur : array-like
+        measured transit durations [days]
+    data_err : array-like
+        corresponding errors [days]
+        
+    Returns
+    -------
+    residuals : array-like
+        error-scaled residuals on transit durations
+    """
     cosi = x0
     period, rho, rprs = x1
     
@@ -68,12 +99,21 @@ def residuals_for_duration_fit(x0, x1, data_dur, data_err):
 
 
 def calculate_flatness(data_dur, model_dur):
-    '''
+    """
     Helper function to calculate flatness
     
-    data_dur: measured transit durations [days]
-    model_dur: model transit durations [days] from leastsq fit
-    '''
+    Parameters
+    ----------
+    data_dur : array-like
+        measured transit durations [days]
+    model_dur: array-like
+        model transit durations [days] from leastsq fit
+        
+    Returns
+    -------
+    flatness : array-like
+        flatness measure
+    """
     return np.std(data_dur-model_dur)/np.sqrt(np.mean(data_dur**2))
 
 
@@ -83,64 +123,98 @@ def calculate_flatness(data_dur, model_dur):
 
 
 def mu(mp, Mstar):
-    '''
-    Dynamical mass
+    """
+    Dynamical mass, mu
     
-    mp: array of planet masses [M_earth]
-    Mstar: stellar mass [M_sun]
-    '''
+    Parameters
+    ----------
+    mp : array-like
+        planet masses [M_earth]
+    Mstar : float
+        stellar mass [M_sun]
+    """
     return np.sum(mp)/MSME/Mstar
 
 
 def Q(masses):
-    '''
-    Mass partitioning
+    """
+    Mass partitioning, Q
     
-    masses: array of planet masses
-    '''
+    Parameters
+    ----------
+    masses : array-like
+        planet masses [any units]
+    """
     return LMC.D(masses/np.sum(masses))
 
 
 def M(periods, masses):
-    '''
-    Monotonicity
+    """
+    Monotonicity, M
     
-    periods: array of planet periods
-    masses: array of planet masses corresponding to each given period
-    '''
+    Parameters
+    ----------
+    periods : array-like
+        orbital periods [any units]
+    masses : array-like
+        planet masses corresponding to each given period [any units]
+    """
     N = len(periods)
     rho = stats.spearmanr(periods, masses)[0]
     
     return rho*Q(masses)**(1/N)
 
 
-def S(periods, mp, Mstar):
-    '''
-    Characteristic spacing
+def S(periods, mp, Mstar, warn=True):
+    """
+    Characteristic spacing, S
     
-    periods: array of planet periods [days]
-    mp: array of planet masses [M_earth]
-    Mstar: Stellar mass [M_sun]
-    '''
-    a = P_to_a(periods, Mstar)
+    Parameters
+    ----------
+    periods : array-like
+        orbital periods [days]
+    mp : array-like
+        planet masses corresponding to each given period [M_earth]
+    Mstar : float
+        Stellar mass [M_sun]
+    warn : bool (optional)
+        flag to control warnings (default=True)    
+    """
+    if len(periods) < 2:
+        if warn:
+            warnings.warn('Characteristic spacing is undefined for S < 2; returning NaN')
+        return np.nan
     
-    radius_H = ((mp[1:]+mp[:-1])/(3*Mstar*MSME))**(1/3) * (a[1:]+a[:-1])/2
-    delta_H  = (a[1:]-a[:-1])/radius_H
+    elif len(periods) >= 2:
+        order = np.argsort(periods)
     
-    return np.mean(delta_H)
+        periods = periods[order]
+        mp = mp[order]
+    
+        a = P_to_a(periods, Mstar)
+
+        radius_H = ((mp[1:]+mp[:-1])/(3*Mstar*MSME))**(1/3) * (a[1:]+a[:-1])/2
+        delta_H  = (a[1:]-a[:-1])/radius_H
+
+        return np.mean(delta_H)
 
 
 def C(periods, warn=True):
-    '''
-    Gap complexity
+    """
+    Gap complexity, C
     
-    periods: array of planet periods
-    warn: boolean flag to control warnings (default=True)
-    '''
+    Parameters
+    ----------
+    periods : array-like
+        planet periods
+    warn : bool (optional)
+        flag to control warnings (default=True)
+    """
     if len(periods) < 3:
         if warn:
             warnings.warn('Complexity is undefined for N < 3; returning NaN')
         return np.nan
+    
     elif len(periods) >= 3:
         order = np.argsort(periods)
   
@@ -151,14 +225,22 @@ def C(periods, warn=True):
     
 
 def f(periods, rhostar, rprs, dur, dur_err):
-    '''
-    periods: orbital periods [days]
-    rhostar: stellar density [solar density]
-    rprs: planet-to-star radius ratio
-    dur: transit durations [hours]
-    dur_err: corresponding errors on transit durations
-    '''
+    """
+    Flatness, f
     
+    Parameters
+    ----------
+    periods : array-like
+        orbital periods [days]
+    rhostar : float
+        stellar density [solar density]
+    rprs : array-like
+        planet-to-star radius ratios corresponding to given periods
+    dur : array-like
+        transit durations corresponding to given periods [hours]
+    dur_err : array-like
+        corresponding errors on transit durations [hours
+    """
     cosi = np.array([0.0])
     transit_params = [periods, rhostar, rprs]
         

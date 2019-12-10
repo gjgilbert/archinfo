@@ -41,7 +41,7 @@ def H(p, normalize_output=True):
 
 def D(p, normalize_output=True):
     """
-    Calculates disequliibrium from a probability vector
+    Calculates disequlibrium from a probability vector
 
     p : array-like
         vector of probabilities; will be normalized if not done so already
